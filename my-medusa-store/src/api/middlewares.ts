@@ -1,8 +1,13 @@
 import { defineMiddlewares,
-    validateAndTransformBody
+    validateAndTransformBody,
+    validateAndTransformQuery
 } from "@medusajs/framework";
 import { PostAdminCreateBrand } from "./admin/brands/validators";
 import { z } from "zod"
+
+import { createFindParams } from "@medusajs/medusa/api/utils/validators"
+
+export const GetBrandsSchema = createFindParams()
 
 export default defineMiddlewares({
     routes: [
@@ -20,5 +25,23 @@ export default defineMiddlewares({
                     brand_id: z.string().optional(),
             },
         },
+        {
+            matcher: "/admin/brands",
+            method: "GET",
+            middlewares: [
+                validateAndTransformQuery(
+                GetBrandsSchema,
+                {
+                    defaults: [
+                    "id",
+                    "name",
+                    "products.*",
+                    ],
+                    isList: true,
+                }
+                ),
+            ],
+        },
+
     ],
 })
