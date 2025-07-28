@@ -35,32 +35,50 @@ const columns = [
 ]
 
 const BrandsPage = () => {
-  // TODO retrieve brands
+    // TODO retrieve brands
 
-  const limit = 15
-const [pagination, setPagination] = useState<DataTablePaginationState>({
-  pageSize: limit,
-  pageIndex: 0,
-})
-const offset = useMemo(() => {
-  return pagination.pageIndex * limit
-}, [pagination])
+    const limit = 15
+    const [pagination, setPagination] = useState<DataTablePaginationState>({
+        pageSize: limit,
+        pageIndex: 0,
+    })
+    const offset = useMemo(() => {
+        return pagination.pageIndex * limit
+    }, [pagination])
 
-const { data, isLoading } = useQuery<BrandsResponse>({
-  queryFn: () => sdk.client.fetch(`/admin/brands`, {
-    query: {
-      limit,
-      offset,
-    },
-  }),
-  queryKey: [["brands", limit, offset]],
-})
+    const { data, isLoading } = useQuery<BrandsResponse>({
+        queryFn: () => sdk.client.fetch(`/admin/brands`, {
+            query: {
+                limit,
+                offset,
+            },
+        }),
+        queryKey: [["brands", limit, offset]],
+    })
 
-// TODO configure data table
+    // TODO configure data table
+    const table = useDataTable({
+        columns,
+        data: data?.brands || [],
+        getRowId: (row) => row.id,
+        rowCount: data?.count || 0,
+        isLoading,
+        pagination: {
+            state: pagination,
+            onPaginationChange: setPagination,
+        },
+    })
 
   return (
     <Container className="divide-y p-0">
       {/* TODO show brands */}
+        <DataTable instance={table}>
+            <DataTable.Toolbar className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
+                <Heading>Brands</Heading>
+            </DataTable.Toolbar>
+            <DataTable.Table />
+            <DataTable.Pagination />
+        </DataTable>
     </Container>
   )
 }
